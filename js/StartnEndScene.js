@@ -12,9 +12,9 @@ function setUpInstructionScreen() {
 
     // Set the appropriate image based on the parameter
     if (MobileDeviceOrNot) {
-        instructionImage.src = "images/control_Exhibition.png";
+        instructionImage.src = "images/control_Mobile.png";
     } else {
-        instructionImage.src = "images/control_PC.png";
+        instructionImage.src = "images/control_Exhibition.png";
     }
     instructionScreen.classList.add('hidden');
 }
