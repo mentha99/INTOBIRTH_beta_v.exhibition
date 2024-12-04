@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>INTO BIRTH</title>
+    <link rel="icon" type="image/x-icon" sizes="32x32" href="./images/icons/icon.ico">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link type="text/css" rel="stylesheet" href="style.css">
+
+    <!-- Fonts Import -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
+
+    <script src="https://unpkg.com/typewriter-effect@latest/dist/core.js"></script>
+    <script src=js/three.min.js></script>
+    <script src=js/OrbitControls_1118.js></script>
+
+
+</head>
+
+<body>
+    <div class="ui-container" style="display: none;">
+        <div class="ui-item">.</div>
+        <div class="ui-item">.</div>
+        <div class="ui-item"><img src="./images/icons/LoadingPage_01.png"></div>
+    </div>
+
+
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <img src="images/icons/LoadingPage_01.png" alt="LoadingTitle" class="loading-image" />
+    </div>
+
+    <!-- Control Instruction Screen -->
+    <div id="instruction-screen" class="instruction-screen">
+        <img id="instruction-image" src="" alt="Instructions">
+    </div>
+
+    <!-- Instruction Text -->
+    <div class="flex-container">
+        <div class="text-container">
+            <h1 id="khj3"></h1>
+        </div>
+    </div>
+
+    <!-- Icon Button Container -->
+    <div class="button-container">
+        <img id="muteIcon" src="images/icons/mute.svg" alt="Mute" class="mute-icon" style="display: none;" />
+        <img id="unmuteIcon" src="images/icons/unmute.svg" alt="Unmute" class="mute-icon" />
+    </div>
+
+    <!-- Mobile Touch Area Container -->
+    <div class="bottom-area"><img id="bottomArea" src="images/icons/transArea.png" class="clickArea" /></div>
+    <div class="top-area"><img id="topArea" src="images/icons/transArea.png" class="clickArea" /></div>
+
+
+    <!-- Panorama Scene -->
+    <div class="three-container">
+        <div class="scene"></div>
+        <video id="video2" playsinline webkit-playsinline src="images/20241129_2k.mp4" style="display: none;"></video>
+    </div>
+
+    <!-- Time line keyframe -->
+    <script src="js/TimeLineKeyFrame.js"></script>
+
+    <!-- Debugging Paremeter -->
+    <script>
+        const videoStartFrame = 0; //set to specific frame for debugging
+        let textEndOrNot = false; //set to true for debugging
+        const textDebugSpeed = false;
+    </script>
+
+    <!-- Link audio and image file -->
+    <script src="js/AudioElements.js"></script>
+    <script src="js/StartnEndScene.js"></script>
+
+    <!-- Tool set up -->
+    <script src="js/PanoramaSetUp.js"></script>
+    <script src="js/ControlSetUp.js"></script>
+    <script src="js/VideoPlayer.js"></script>
+
+    <!-- Elements Player -->
+    <script src="js/AudioPlayer.js"></script>
+    <script src="js/AudioHover.js"></script>
+    <script src="js/TextPlayer.js"></script>
+
+
+    <!-- Parameter Control for different platform -->
+
+
+    <!-- Initialize scene -->
+    <script>
+        let container, camera, renderer, scene, controls;
+        let initialCameraForward;
+        let initialCameraPosition;
+        let initialCameraRotation;
+        let initialYawRotation;
+        let rotateControl; // Declare in a higher scope
+        const MobileDeviceOrNot = isMobileDevice();
+        const mouseRotate = true;
+
+        const sceneFOV = 90;
+
+        function init() {
+            setUpInstructionScreen();
+            container = document.querySelector(".scene");
+
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color('white');
+
+
+            // Create camera
+            const fov = sceneFOV;
+            const aspect = container.clientWidth / container.clientHeight;
+            const near = 0.01;
+            const far = 4000;
+            camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+            camera.position.set(0, 0, 0);// if change camera position, keys control will not work
+            camera.rotation.z = Math.PI / 2;
+            camera.fov = sceneFOV;
+
+            // Variable to calculate the yaw rotation
+            initialCameraForward = new THREE.Vector3(0, 0, -1); // Default forward vector in Three.js
+            initialCameraPosition = camera.position.clone();
+            initialCameraRotation = camera.rotation.clone(); // Capture the initial rotation
+            initialYawRotation = camera.rotation.y;
+
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            // Setup start textures and sphere geometry
+            setupPanorama();
+            setUpControl();
+
+
+            /* Hover Birth song player
+            // Create a raycaster outside of the function
+            const raycaster = new THREE.Raycaster();
+
+            // Usage example for three icons
+            addAudioIcon('images/music_icon_01.png', 'audio/Birth_Uncle.mp3', new THREE.Vector3(-891, 450, -638), raycaster);
+            addAudioIcon('images/music_icon_02.png', 'audio/Birth_Dad.mp3', new THREE.Vector3(-359, 722, -888), raycaster);
+            addAudioIcon('images/music_icon_03.png', 'audio/Birth_Mom.mp3', new THREE.Vector3(97, 770, -927), raycaster);
+            addAudioIcon('images/music_icon_04.png', 'audio/Birth_Aunt.mp3', new THREE.Vector3(700, 722, -653), raycaster);
+            addAudioIcon('images/music_icon_05.png', 'audio/Birth_Ella.mp3', new THREE.Vector3(860, 833, 75), raycaster);
+            */
+
+        }
+        init();
+
+        window.addEventListener("resize", () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+    </script>
+
+    <!-- Main controller -->
+    <script src="js/FrameBasedControl.js"></script>
+
+    <script>
+        const muteIcon = document.getElementById('muteIcon');
+        const unmuteIcon = document.getElementById('unmuteIcon');
+        let isMuted = false;
+
+        // Handle mute/unmute toggle
+        document.querySelector('.button-container').addEventListener('click', () => {
+            isMuted = !isMuted;
+            console.log("isMuted = true");
+
+            // Mute or unmute all audio and video elements
+            allAudioElements.forEach((audio) => {
+                audio.muted = isMuted; // Set the muted property
+            });
+
+            // Toggle visibility of the icons
+            muteIcon.style.display = isMuted ? 'block' : 'none';
+            unmuteIcon.style.display = isMuted ? 'none' : 'block';
+        });
+
+        // still not working with mobile sounds play
+        document.querySelector('.button-container').addEventListener("click", async () => {
+            try {
+                await loadAllAudioOnClick(allAudioElements); // Load all audio files
+                console.log("Audio loading process completed.");
+                // Optionally, perform other actions once audio is loaded
+            } catch (error) {
+                console.error("Error loading audio:", error);
+            }
+        });
+
+
+    </script>
+
+</body>
+
+
+</html>
